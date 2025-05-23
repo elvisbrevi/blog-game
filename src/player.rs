@@ -11,7 +11,7 @@ pub struct Player {
 /// Sistema que configura el jugador
 pub fn setup_player(mut commands: Commands, asset_server: Res<AssetServer>) {
     let sprite = Sprite::from_image(asset_server.load("test.png"));
-    let size = Vec2::new(100.0, 100.0);
+    let size = Vec2::new(50.0, 50.0);
 
     commands
         .spawn((
