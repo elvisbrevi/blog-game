@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use bevy_rapier2d::prelude::*;
 
 /// Componente que define las propiedades del jugador
 #[derive(Component)]
@@ -9,11 +10,19 @@ pub struct Player {
 
 /// Sistema que configura el jugador
 pub fn setup_player(mut commands: Commands, asset_server: Res<AssetServer>) {
-    commands.spawn((
-        Player { speed: 200.0 },
-        Sprite::from_image(asset_server.load("test.png")),
-        Transform::from_xyz(0., 0., 0.),
-    ));
+    let sprite = Sprite::from_image(asset_server.load("test.png"));
+    let size = Vec2::new(100.0, 100.0);
+
+    commands
+        .spawn((
+            Player { speed: 200.0 },
+            sprite,
+            Transform::from_xyz(size.x, size.y, 0.),
+            RigidBody::Dynamic,
+            Collider::cuboid(size.x, size.y),
+        ))
+        .insert(LockedAxes::ROTATION_LOCKED)
+        .insert(Dominance::group(10));
 }
 
 /// Sistema que maneja el movimiento del jugador
@@ -55,6 +64,56 @@ pub struct PlayerPlugin;
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Startup, setup_player)
-           .add_systems(Update, move_player);
+            .add_systems(Update, move_player)
+            .insert_resource(ClearColor(Color::srgb(
+                0xF9 as f32 / 255.0,
+                0xF9 as f32 / 255.0,
+                0xFF as f32 / 255.0,
+            )))
+            .add_plugins((
+                RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(100.0),
+                RapierDebugRenderPlugin::default(),
+            ))
+            .add_systems(Startup, setup_physics);
+    }
+}
+
+pub fn setup_physics(mut commands: Commands) {
+    /*
+     * Ground
+     */
+    let ground_size = 500.0;
+    let ground_height = 10.0;
+
+    commands.spawn((
+        Transform::from_xyz(0.0, 0.0 * -ground_height, 0.0),
+        Collider::cuboid(ground_size, ground_height),
+    ));
+
+    /*
+     * Create the cubes
+     */
+    let num = 8;
+    let rad = 10.0;
+
+    let shift = rad * 2.0 + rad;
+    let centerx = shift * (num / 2) as f32;
+    let centery = shift / 2.0;
+
+    let mut offset = -(num as f32) * (rad * 2.0 + rad) * 0.5;
+
+    for j in 0usize..20 {
+        for i in 0..num {
+            let x = i as f32 * shift - centerx + offset;
+            let y = j as f32 * shift + centery + 30.0;
+
+            commands.spawn((
+                Transform::from_xyz(x, y, 0.0),
+                RigidBody::Dynamic,
+                Collider::cuboid(rad, rad),
+            ));
+        }
+
+        offset -= 0.05 * rad * (num as f32 - 1.0);
     }
 }
