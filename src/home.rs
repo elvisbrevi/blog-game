@@ -19,4 +19,19 @@ pub fn setup_physics(mut commands: Commands) {
         Transform::from_xyz(0.0, 0.0 * -ground_height, 0.0),
         Collider::cuboid(ground_size, ground_height),
     ));
+
+    commands.spawn((
+        Transform::from_xyz(0.0, 50.0 * -ground_height, 0.0),
+        Collider::cuboid(ground_size, ground_height),
+    ));
+
+    commands.spawn((
+        Transform::from_xyz(0.0, 100.0 * -ground_height, 0.0),
+        Collider::cuboid(ground_size, ground_height),
+    ));
+
+    commands.spawn((
+        Transform::from_xyz(0.0, 150.0 * -ground_height, 0.0),
+        Collider::cuboid(ground_size, ground_height),
+    ));
 }

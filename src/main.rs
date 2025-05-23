@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 mod home;
-mod player; // Importa el módulo player
+mod player;
 use home::HomePlugin;
 use player::PlayerPlugin;
 
